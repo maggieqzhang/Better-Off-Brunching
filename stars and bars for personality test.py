@@ -1,7 +1,7 @@
 # program stars and bars to be able to classify the diff types of thank you screens
 from itertools import combinations
 
-def stars_and_bars(stars, bars):
+def logic_jumps_typeform(stars, bars):
 
     results = []
     
@@ -19,6 +19,6 @@ def stars_and_bars(stars, bars):
     recurse(stars, bars)
     return results
 
-a = stars_and_bars(8,4)
-print(a)
+tester = logic_jumps_typeform(8,4)
+print(tester)
 
