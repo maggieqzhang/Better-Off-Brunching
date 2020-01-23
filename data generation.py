@@ -1,24 +1,11 @@
 # CREATING REALISTIC DATA TO TEST IN CLUSTERING ALGORITHM 
 
-# interesting psychology to consider
-
-### PRIMARY CHARACTERISTICS 
-
-# socialness and intellect perhaps are more inversely related than one would expect
-# being artistic is independent generally of all other factors
-# being adventurous is directly related to ambition and inverse to intellect
-
-### SECONDARY CHARACTERISTICS'
-
-# high intellect = higher chance of liking books and higher chacne of liking tech
-# getting music is like 70% chance in general
+# interesting psychology to consider for primary and secondary attributes
 
 from random import randint
 import random as r
 import numpy as np
-
-# fix the random output
-##r.seed(a=4)
+import csv
 
 # in order of 1, 2, 3, 4
 intellect_weight = [0.1, 0.4, 0.3, 0.2]
@@ -38,8 +25,6 @@ adventure_weight_low = [0.1, 0.2, 0.4, 0.3]
 ambition_weight_low = [0.1, 0.4, 0.3, 0.2]
 
 # categories
-#categories = ['books', 'crafting', 'fashion', 'gaming', 'movies', 'music', 'partying', 'pets', 'politics', 'religion', 'sports', 'tech']
-#order_weight = [0.1,    0.08,       0.05,      0.05,      0.1,       0.15,   0.12,      0.11,     0.08,      0.15,       0.1,      0.08]
 
 gender = ['M', 'F']
 
@@ -90,11 +75,6 @@ music_sub = {'pop':0.4,
              'rock':0.1,
              'jazz':0.1}
 
-'''
-number_to_name = {}
-for ind in range(len(categories)):
-    number_to_name[ind] = categories[ind]
-'''
 # order of selection to fill out the thing 
 # create two dictionaries 
 
@@ -148,7 +128,7 @@ def select_random_primary(weights):
             return index + 1 # gives the score for this category
 
 def select_random_secondary(weights_sec, secondary_list, dict_weights):
-    #ind = select_random_primary(weights_sec) - 1 # do it manually using dictionary style aiyahhhh
+    # do it manually using dictionary style 
     sec_cat, sec_weight = zip(*weights_sec.items())
     ind = select_random_primary(sec_weight) - 1
     if secondary_list[ind] == 1:
@@ -265,19 +245,17 @@ def create_data():
     
     person_cats, person_scores = zip(*person.items())
     person_scores = list(person_scores)
+    people = []
     for sec in secondary:
-        print(person_scores + sec)
-    #return person_scores + [d for sec in secondary for d in sec]
+        people.append((person_scores + sec))
+    return people
 
-import csv
 
-'''
-with open('testData.csv', mode='w') as employee_file:
-    testDataWriter = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    ## xd i didn't finish this part 
+# writing data to CSV file
+with open("test_data.csv", mode = "w") as test_data:
+    test_writer = csv.writer(test_data, delimiter = ",",quotechar = '"', quoting = csv.QUOTE_MINIMAL)
     for i in range(100):
-        testDataWriter.writerow(create_data())
+        person_data = create_data()
+        for val in person_data:
+            test_writer.writerow(val)
 
-'''
-
-#print(create_data())
