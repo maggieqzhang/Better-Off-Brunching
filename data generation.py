@@ -1,30 +1,34 @@
 # CREATING REALISTIC DATA TO TEST IN CLUSTERING ALGORITHM 
 
-# interesting psychology to consider for primary and secondary attributes
+''' 
+create random data for primary and secondary attributes
+generally, a "high" score in any category is 3 or 4, while a low score is 1 or 2
+'''
 
 from random import randint
 import random as r
 import numpy as np
 import csv
 
+# the probability of any given person of achieving each intelletualism score
 # in order of 1, 2, 3, 4
 intellect_weight = [0.1, 0.4, 0.3, 0.2]
 
-# artistic depending on gender
+# artistic weight depending on gender
 artistic_weight_M = [0.1, 0.5, 0.3, 0.1]
 artistic_weight_F = [0.1, 0.3, 0.4, 0.2]
 
-# if high intellect (3 or 4)
+# if high intellectualism (3 or 4)
 social_weight_high = [0.3, 0.4, 0.2, 0.1]
 adventure_weight_high = [0.3, 0.4, 0.2, 0.1]
 ambition_weight_high = [0.1, 0.3, 0.4, 0.2]
 
-# if lower intellect (1 or 2)
+# if lower intellectualism (1 or 2)
 social_weight_low = [0.1, 0.2, 0.4, 0.3]
 adventure_weight_low = [0.1, 0.2, 0.4, 0.3]
 ambition_weight_low = [0.1, 0.4, 0.3, 0.2]
 
-# categories
+# demographics and secondary categories 
 
 gender = ['M', 'F']
 
@@ -47,7 +51,7 @@ categories = {'crafting':0.08,
               'photography':0.05,
               'movies':0.12}
 
-#if directed to any of the subcategories, choose at random 1-3 items assume each has 50% chance of liking the sport chosen  
+#if directed to any of the subcategories, choose at random 1-3 items
 sports_sub = {'basketball':0.2,
               'baseball':0.25,
               'football':0.4,
@@ -75,24 +79,21 @@ music_sub = {'pop':0.4,
              'rock':0.1,
              'jazz':0.1}
 
-# order of selection to fill out the thing 
-# create two dictionaries 
-
-# weighting in order of 0, 1 (no, yes)
+# weighting in selection probability in order of 0, 1 (no, yes)
 music_weight = [0.3, 0.7]
 movie_weight = [0.4, 0.6]
 religion_weight = [0.8, 0.2]
 
-# if high intellect
+# if high intellectual, more likely to like books and tech
 book_weight = [0.3, 0.7]
 tech_weight = [0.4, 0.6]
-# if low intellect
+# if low intellectualism, less likely to enjoy books and tech
 book_weight_low = [0.7, 0.3]
 tech_weight_low = [0.65, 0.35]
 
-# if high social
+# if high social, more likely to party
 partying_weight = [0.3, 0.7]
-# if low social
+# if low social, less likely to party
 partying_weight_low = [0.8, 0.2]
 
 # if high artistic
@@ -118,52 +119,91 @@ male_cooking_weight = [0.6, 0.4]
 male_gaming_weight = [0.3, 0.7]
 
 def select_random_primary(weights):
-    w = [int(100*num) for num in weights]
+    """ 
+    Randomly selects a score for a primary attribute given weighting probabilities
+  
+    Parameters: 
+    weights (list): probability of getting a certain score in order of [1,2,3,4]
+  
+    Returns: 
+    int: primary attribute score  
+    """
+    # general alg for random weighted selection is choosing a random number and seeing where it falls in the range
+    w = [int(100*num) for num in weights] 
     w_sum = sum(w)
-    rand_weight = randint(0, w_sum-1)
+    rand_weight = randint(0, w_sum - 1)
     total = 0
     for index in range(len(w)):
         total += w[index]
         if rand_weight < total:
-            return index + 1 # gives the score for this category
+            return index + 1 # gives the score for category
 
 def select_random_secondary(weights_sec, secondary_list, dict_weights):
-    # do it manually using dictionary style 
-    sec_cat, sec_weight = zip(*weights_sec.items())
+    """ 
+    Randomly selects a secondary attribute and then randomly decides if it is a characteristic of person
+  
+    Parameters: 
+    weights_sec (dictionary): probability of selecting any given secondary char initially
+    secondary_list (list): list with values of 0 or 1 representing secondary attributes 
+    dict_weights (dictionary): a dictionary containing all secondary attribute and the probability that they turn up 0 or 1 
+  
+    Returns: 
+    No returns. Directly modifies secondary_list with updated values 
+    """
+    sec_cat, sec_weight = zip(*weights_sec.items()) #unzips dictionary to give both var names and rel weightings
     ind = select_random_primary(sec_weight) - 1
-    if secondary_list[ind] == 1:
+    if secondary_list[ind] == 1: # secondary char was already chosen before
         return
-    else:
-        category_name = sec_cat[ind]
-        if category_name == "watching sports":
+    else: # category never chosen before
+        category_name = sec_cat[ind] 
+        if category_name == "watching sports": # category with subgenres 
             print("sport!")
             secondary_list[ind] = 1
-            sub_secondary(secondary_list, 18, sports_sub)
-        elif category_name == "movies":
+            sub_secondary(secondary_list, 18, sports_sub) # first subgenre after 18 secondary char
+        elif category_name == "movies": # category with subgenres 
             print("movie")
             secondary_list[ind] = 1
-            sub_secondary(secondary_list, 25, movie_sub)
-        elif category_name == "music":
+            sub_secondary(secondary_list, 25, movie_sub) # secondary subgenre afer sec and sports
+        elif category_name == "music": # category with subgenres 
             print("music")
             secondary_list[ind] = 1
-            sub_secondary(secondary_list, 34, music_sub)
+            sub_secondary(secondary_list, 34, music_sub) # third subgenre after sec, sports, and movies 
         else:
-            bin_val = select_random_primary(dict_weights[category_name]) - 1
+            bin_val = select_random_primary(dict_weights[category_name]) - 1 # just a normal category
             secondary_list[ind] = bin_val
         return 
     
 def sub_secondary(sec_list, addition, sub_dict):
+    """ 
+    Given that an expanded secondary char was chosen, it deterines how many and which sub genres are chosen
+  
+    Parameters: 
+    sec_list (list): list with values of 0 or 1 representing secondary attributes 
+    addition (int): the amount added to the index. value shift
+    sub_dict (dictionary): the dictionary of values and prob weights for genres
+  
+    Returns: 
+    int: primary attribute score  
+    """
     sub_cat, sub_weight = zip(*sub_dict.items())
     num_cats = randint(1,3)
     for i in range(num_cats):
-        sub_ind = select_random_primary(sub_weight) - 1 + addition
+        sub_ind = select_random_primary(sub_weight) - 1 + addition # accounts for index shift for subgenres
         sec_list[sub_ind] = 1
 
 def select_set(prim):
-    # given the primary characteristics, which set of secondary chars should the program use 
+    """ 
+    Given a set of primary characteristics, selects which secondary characteristic weightings the program should use
+  
+    Parameters: 
+    prim (dictionary): dictionary of primary attributes and associated values 
+  
+    Returns: 
+    secondary_dict (dictionary): a dictionary with all secondary attributes and associated weightings 
+    """
     secondary_dict = {}
-    g = prim['gender']
     
+    g = prim['gender']
     secondary_dict['music'] = music_weight
     secondary_dict['movies'] = movie_weight
     secondary_dict['religion'] = religion_weight
@@ -197,21 +237,31 @@ def select_set(prim):
         secondary_dict['gaming'] = male_gaming_weight
         
     for cat in categories:
-        if cat not in secondary_dict:
+        if cat not in secondary_dict: # other secondary interests not dependent on gender/primary
             secondary_dict[cat] = [0.5, 0.5]
     return secondary_dict
 
-def create_data():
-    numMulti = 8
-    person = {}
+def create_data(numMulti):
+    """ 
+    Creates a person with numMulti secondary char variations.
     
+    Using the same set of randomly chosen primary characteristics, numMulti amount of people with differing secondary characteristics is created
+  
+    Parameters: 
+    numMulti (int): number of people to create with the same generated set of primary characteristics
+  
+    Returns: 
+    people (list): a list of numMulti number of lists each representing a "different" person
+    """
+    person = {}
     age = 0
-    while age < 21 or age > 35:
+    while age < 21 or age > 35: # person between 31 and 35 with normal distribution closer to young side
         age = round(np.random.normal(26, 4))
     
     ''' ---------------------
      primary characteristics 
     --------------------- '''
+    # generates the random primary characteristics for this person 
     person['gender'] = gender[randint(0,1)]
     person['age'] = age
     person['intellect'] = select_random_primary(intellect_weight)
@@ -231,31 +281,29 @@ def create_data():
     ''' -----------------------
      secondary characteristics 
     ----------------------- '''
-    
+    # creates a list of numMulti number of lists representing each person
     secondary = [[0 for i in range(42)] for j in range(numMulti)]
     
-    weight_dict = select_set(person)
+    weight_dict = select_set(person) # the weighted dictionary of secondary values 
 
-    num_secondaries = [r.choices([8,9,10,11,12,13,14,15])[0] for i in range(numMulti)]
+    num_secondaries = [r.choices([8,9,10,11,12,13,14,15])[0] for i in range(numMulti)] # randomly choose between 8-15 secondary chars
 
     for i in range(numMulti):
         num_secondary = num_secondaries[i]
-        while sum(secondary[i]) < num_secondary:
+        while sum(secondary[i]) < num_secondary: #see if there is enough secondary char selected
             select_random_secondary(categories, secondary[i], weight_dict)
     
-    person_cats, person_scores = zip(*person.items())
+    person_cats, person_scores = zip(*person.items()) #unzips original person dictionary to be able to turn into lists
     person_scores = list(person_scores)
     people = []
     for sec in secondary:
         people.append((person_scores + sec))
     return people
 
-
 # writing data to CSV file
 with open("test_data.csv", mode = "w") as test_data:
     test_writer = csv.writer(test_data, delimiter = ",",quotechar = '"', quoting = csv.QUOTE_MINIMAL)
-    for i in range(100):
-        person_data = create_data()
+    for i in range(100): # creates 100 randomly generated people 
+        person_data = create_data(8)
         for val in person_data:
             test_writer.writerow(val)
-
