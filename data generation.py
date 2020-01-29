@@ -11,22 +11,25 @@ import numpy as np
 import csv
 
 # the probability of any given person of achieving each intelletualism score
-# in order of 1, 2, 3, 4
-intellect_weight = [0.1, 0.4, 0.3, 0.2]
+# in order of 1, 2, 3, 4, 5
+intellect_weight = [0.1, 0.2, 0.4, 0.2, 0.1]
 
 # artistic weight depending on gender
-artistic_weight_M = [0.1, 0.5, 0.3, 0.1]
-artistic_weight_F = [0.1, 0.3, 0.4, 0.2]
+artistic_weight_M = [0.1, 0.4, 0.2, 0.2, 0.1]
+artistic_weight_F = [0.05, 0.15, 0.3, 0.3, 0.2]
 
-# if high intellectualism (3 or 4)
-social_weight_high = [0.3, 0.4, 0.2, 0.1]
-adventure_weight_high = [0.3, 0.4, 0.2, 0.1]
-ambition_weight_high = [0.1, 0.3, 0.4, 0.2]
+# if high intellectualism (4 or 5)
+social_weight_high = [0.3, 0.35, 0.2, 0.1, 0.05]
+adventure_weight_high = [0.3, 0.35, 0.2, 0.1, 0.05]
+ambition_weight_high = [0.1, 0.2, 0.3, 0.2, 0.2]
 
 # if lower intellectualism (1 or 2)
-social_weight_low = [0.1, 0.2, 0.4, 0.3]
-adventure_weight_low = [0.1, 0.2, 0.4, 0.3]
-ambition_weight_low = [0.1, 0.4, 0.3, 0.2]
+social_weight_low = [0.05, 0.15, 0.3, 0.3, 0.2]
+adventure_weight_low = [0.1, 0.2, 0.3, 0.3, 0.1]
+ambition_weight_low = [0.1, 0.3, 0.35, 0.15, 0.1]
+
+# if avg, then use this average weighting 
+average = [0.1, 0.2, 0.4, 0.2, 0.1]
 
 # demographics and secondary categories 
 
@@ -207,23 +210,23 @@ def select_set(prim):
     secondary_dict['music'] = music_weight
     secondary_dict['movies'] = movie_weight
     secondary_dict['religion'] = religion_weight
-    if prim['intellect'] == 3 or prim['intellect'] == 4:
+    if prim['intellect'] == 4 or prim['intellect'] == 5:
         secondary_dict['books'] = book_weight
         secondary_dict['tech'] = tech_weight
-    else:
+    elif prim['intellect'] != 3:
         secondary_dict['books'] = book_weight_low
         secondary_dict['tech'] = tech_weight_low
-    if prim['social'] == 3 or prim['social'] == 4:
+    if prim['social'] == 4 or prim['social'] == 5:
         secondary_dict['partying'] = partying_weight
-    else:
+    elif prim['social'] != 3:
         secondary_dict['partying'] = partying_weight_low
-    if prim['artistic'] == 3 or prim['artistic'] == 4:
+    if prim['artistic'] == 4 or prim['artistic'] == 5:
         secondary_dict['crafting'] = crafting_weight
         secondary_dict['fashion'] = fashion_weight
-    else:
+    elif prim['artistic'] != 3:
         secondary_dict['crafting'] = crafting_weight_low
         secondary_dict['fashion'] = fashion_weight_low
-    if prim['adventure'] == 3 or prim['adventure'] == 4:
+    if prim['adventure'] == 4 or prim['adventure'] == 5:
         secondary_dict['playing sports'] = sports_weight
     if g == "F":
         secondary_dict['watching sports'] = female_sports_watch
@@ -265,14 +268,18 @@ def create_data(numMulti):
     person['gender'] = gender[randint(0,1)]
     person['age'] = age
     person['intellect'] = select_random_primary(intellect_weight)
-    if person['intellect'] == 3 or person['intellect'] == 4:
+    if person['intellect'] == 4 or person['intellect'] == 5:
         person['social'] = select_random_primary(social_weight_high)
         person['adventure'] = select_random_primary(adventure_weight_high)
         person['ambition'] = select_random_primary(ambition_weight_high)
-    else:
+    elif person['intellect'] != 3:
         person['social'] = select_random_primary(social_weight_low)
         person['adventure'] = select_random_primary(adventure_weight_low)
         person['ambition'] = select_random_primary(ambition_weight_low)
+    else:
+        person['social'] = select_random_primary(average)
+        person['adventure'] = select_random_primary(average)
+        person['ambition'] = select_random_primary(average)
     if person['gender'] == "M":
         person['artistic'] = select_random_primary(artistic_weight_M)
     else:
